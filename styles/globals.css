@@ -1,0 +1,19 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #B8943F;
+  --gold-light: #D4AF6A;
+  --bg: #F6F4EF;
+  --text: #18140F;
+  --text-muted: #6B5E4C;
+  --border: #E2DDD5;
+  --success: #2D7A4F;
+  --danger: #C0392B;
+}
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
