@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portal ILP · Rafael Mendanha</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+:root{--bg:#060810;--s1:#0b0e17;--s2:#10141e;--s3:#161b27;--s4:#1c2232;--gold:#b8964a;--gold2:#d4af6a;--text:#dde1ea;--t2:#7a8196;--t3:#424858;--green:#2db87a;--red:#c95050;--b2:#2563b8;--b3:#4a90d4;--b4:#7ab8e8;--teal:#1a6a5a;--teal2:#2ab8a4;--br:rgba(184,150,74,.1);--br2:rgba(255,255,255,.05);--br3:rgba(255,255,255,.03);--r:10px;--rs:7px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;-webkit-font-smoothing:antialiased}
+.hdr{background:var(--s1);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--br);position:sticky;top:0;z-index:10}
+.logo{font-size:.95rem;font-weight:500;letter-spacing:.18em;color:#fff;text-transform:uppercase}
+.logo em{color:var(--gold);font-style:normal;font-weight:300}
+.tagline{font-size:.58rem;color:var(--t3);letter-spacing:.16em;text-transform:uppercase;margin-top:3px}
+.nav{display:flex;gap:.25rem;flex-wrap:wrap}
+.nb{background:transparent;border:none;color:var(--t3);padding:.4rem .85rem;border-radius:var(--rs);cursor:pointer;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;font-family:'Inter',sans-serif;transition:all .25s;font-weight:500}
+.nb:hover{color:var(--gold2);background:rgba(184,150,74,.06)}
+.nb.active{color:var(--gold);background:rgba(184,150,74,.1);border-bottom:1px solid var(--gold)}
+.sync{font-size:.6rem;color:var(--t3);display:flex;align-items:center;gap:.4rem}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--t3)}
+.sync-dot.live{background:var(--green);box-shadow:0 0 6px var(--green)}
+.wrap{padding:1.5rem 2rem;max-width:1480px;margin:0 auto}
+.tab{display:none}.tab.active{display:block}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;margin-bottom:1rem}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1rem}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:1rem}
+.card{background:var(--s1);border:1px solid var(--br2);border-radius:var(--r);padding:1.25rem 1.4rem}
+.card-accent{border-color:var(--br)}
+.label{font-size:.58rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:.5rem}
+.value{font-size:1.45rem;font-weight:300;letter-spacing:.02em;color:var(--text);line-height:1}
+.value.lg{font-size:1.75rem}
+.subval{font-size:.67rem;color:var(--t3);margin-top:.35rem}
+.gold{color:var(--gold)}.green{color:var(--green)}.red{color:var(--red)}
+.sec{font-size:.58rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin:1.6rem 0 .9rem;display:flex;align-items:center;gap:.8rem}
+.sec::before{content:'';width:16px;height:1px;background:var(--gold);opacity:.6}
+.sec::after{content:'';flex:1;height:1px;background:var(--br2)}
+.cw{position:relative;width:100%}
+.atv-tbl{width:100%;border-collapse:collapse;font-size:.68rem}
+.atv-tbl td{padding:.3rem .4rem;border-bottom:1px solid var(--br3);vertical-align:middle}
+.atv-tbl tr:last-child td{border-bottom:none}
+.sbar{height:4px;border-radius:2px;overflow:hidden;display:flex;margin:.65rem 0 .4rem}
+.slabs{display:flex;justify-content:space-between;font-size:.61rem;gap:.5rem;flex-wrap:wrap}
+.ilf-wrap{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem}
+.fase{border-radius:var(--rs);padding:.85rem 1rem;border:1px solid var(--br3);background:var(--s2)}
+.fase-active{border-color:rgba(184,150,74,.25);background:linear-gradient(135deg,rgba(184,150,74,.05),rgba(10,13,23,.3))}
+.frow{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.ftitle{font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.fmeta{font-size:.68rem;color:var(--t2);margin-bottom:.4rem}
+.fbar{height:2px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden}
+.fbar-fill{height:100%;border-radius:1px;transition:width 1s ease}
+.fpct{font-size:.62rem;color:var(--t3);margin-top:.3rem}
+.tag{font-size:.55rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:.15rem .5rem;border-radius:3px}
+.tag-active{background:rgba(184,150,74,.12);color:var(--gold)}
+.tag-done{background:rgba(45,184,122,.1);color:var(--green)}
+.tag-locked{background:rgba(255,255,255,.04);color:var(--t3)}
+.tbl{width:100%;border-collapse:collapse;font-size:.7rem}
+.tbl thead tr{border-bottom:1px solid var(--br)}
+.tbl th{padding:.55rem .8rem;color:var(--t3);font-weight:600;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;text-align:left;white-space:nowrap}
+.tbl td{padding:.5rem .8rem;border-bottom:1px solid var(--br3);color:var(--t2);white-space:nowrap}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:rgba(255,255,255,.015)}
+.r{text-align:right}.pos{color:var(--green)}.neg{color:var(--red)}
+.tr-sub td{background:var(--s2);color:var(--text);font-weight:500;border-top:1px solid var(--br)}
+.tr-tot td{background:rgba(184,150,74,.05);color:var(--gold);font-weight:500;border-top:1px solid var(--br)}
+.tr-liq td{background:rgba(45,184,122,.04);color:var(--green);font-weight:500}
+.tr-hd td{background:var(--s3);color:var(--t2);font-weight:600;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase}
+.tr-avg td{color:var(--t2);font-size:.67rem;border-top:1px solid var(--br);font-style:italic}
+.status-ok{display:inline-block;padding:.12rem .5rem;border-radius:3px;font-size:.58rem;font-weight:600;text-transform:uppercase;background:rgba(45,184,122,.08);color:var(--green)}
+.status-pr{display:inline-block;padding:.12rem .5rem;border-radius:3px;font-size:.58rem;font-weight:600;text-transform:uppercase;background:rgba(184,150,74,.08);color:var(--gold)}
+.status-rec{display:inline-block;padding:.12rem .5rem;border-radius:3px;font-size:.58rem;font-weight:600;text-transform:uppercase;background:rgba(42,184,164,.08);color:var(--teal2)}
+.tag-call{display:inline-block;padding:.1rem .4rem;border-radius:3px;font-size:.58rem;font-weight:600;background:rgba(74,144,212,.12);color:var(--b3)}
+.tag-put{display:inline-block;padding:.1rem .4rem;border-radius:3px;font-size:.58rem;font-weight:600;background:rgba(184,150,74,.1);color:var(--gold)}
+.cat-tag{font-size:.58rem;color:var(--t3);margin-left:.3rem}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem;gap:1rem;color:var(--t3)}
+.spinner{width:32px;height:32px;border:2px solid var(--br2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{background:rgba(201,80,80,.06);border:1px solid rgba(201,80,80,.2);border-radius:var(--r);padding:1.5rem;color:#e88;text-align:center;margin:2rem 0;font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div><div class="logo">Portal <em>ILP</em></div><div class="tagline">Inteligência de Longo Prazo</div></div>
+  <div style="display:flex;align-items:center;gap:1.5rem">
+    <div class="sync"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">Carregando...</span></div>
+    <div class="nav">
+      <button class="nb active" onclick="tab('dashboard',this)">Dashboard</button>
+      <button class="nb" onclick="tab('alugueis',this)">Aluguéis</button>
+      <button class="nb" onclick="tab('dividendos',this)">Dividendos</button>
+      <button class="nb" onclick="tab('sinteticos',this)">Sintéticos</button>
+      <button class="nb" onclick="tab('relatorios',this)">Relatórios</button>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+  <div id="loadingScreen" class="loading"><div class="spinner"></div><span>Conectando à planilha...</span></div>
+  <div id="appContent" style="display:none">
+    <div id="tab-dashboard" class="tab active">
+      <div class="sec">Patrimônio</div>
+      <div class="g3" id="cardsPatrimonio"></div>
+      <div class="g2">
+        <div class="card"><div class="label">Por classe de ativo</div><div style="display:flex;gap:1rem;align-items:center"><div style="width:130px;flex-shrink:0;height:155px;position:relative"><canvas id="cPie"></canvas></div><div style="flex:1"><div class="cw" style="height:155px"><canvas id="cBarClasse"></canvas></div></div></div><div id="legClasse" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:.64rem;color:var(--t2)"></div></div>
+        <div class="card"><div class="label">Detalhamento por ativo</div><div style="display:flex;gap:1rem;align-items:flex-start"><div style="width:125px;flex-shrink:0;height:185px;position:relative"><canvas id="cPieAt"></canvas></div><div style="flex:1;max-height:205px;overflow-y:auto"><table class="atv-tbl"><thead><tr><th style="padding:.3rem .4rem;color:var(--t3);font-size:.58rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;text-align:left;border-bottom:1px solid var(--br)">Ativo</th><th style="padding:.3rem .4rem;color:var(--t3);font-size:.58rem;font-weight:600;text-transform:uppercase;text-align:right;border-bottom:1px solid var(--br)">Valor</th><th style="padding:.3rem .4rem;color:var(--t3);font-size:.58rem;font-weight:600;text-transform:uppercase;text-align:right;border-bottom:1px solid var(--br)">%</th></tr></thead><tbody id="tbAt"></tbody></table></div></div></div>
+      </div>
+      <div class="sec">Renda Passiva</div>
+      <div class="g4" id="cardsRenda"></div>
+      <div class="g2">
+        <div class="card"><div class="label">Composição da renda passiva 2026</div><div class="sbar" style="margin-top:.8rem" id="splitBar"></div><div class="slabs" id="splitLabels"></div><div class="cw" style="height:195px;margin-top:1rem"><canvas id="cRenda"></canvas></div><div id="rendaLegend" style="display:flex;gap:1.2rem;margin-top:.75rem;font-size:.62rem;color:var(--t2);flex-wrap:wrap"></div></div>
+        <div class="card card-accent"><div class="label">Índice de Liberdade Financeira</div><div class="ilf-wrap" id="ilfWrap"></div></div>
+      </div>
+      <div class="sec">Renda Passiva Mensal Detalhada — 2026</div>
+      <div class="card" style="margin-bottom:1rem"><table class="tbl"><thead><tr><th>Mês</th><th class="r">Aluguéis</th><th class="r">Dividendos</th><th class="r">Div. Sintéticos</th><th class="r">Total Mês</th></tr></thead><tbody id="tbRenda"></tbody></table></div>
+      <div class="sec">Aportes Realizados — 2026</div>
+      <div class="g3" id="cardsAportes" style="margin-bottom:1rem"></div>
+      <div class="card"><table class="tbl"><thead><tr><th>Mês</th><th class="r">Aporte Mensal</th><th class="r">Acumulado</th></tr></thead><tbody id="tbAportes"></tbody></table></div>
+    </div>
+    <div id="tab-alugueis" class="tab"><div class="sec">Aluguéis</div><div class="g4" id="cardsAlug" style="margin-bottom:1rem"></div><div class="card"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Data</th><th>Classe</th><th>Tipo</th><th>Localização</th><th class="r">Valor Mensal</th><th class="r">Dt. Recebimento</th><th class="r">Valor Pago</th><th>Status</th></tr></thead><tbody id="tbAlug"></tbody></table></div></div></div>
+    <div id="tab-dividendos" class="tab"><div class="sec">Calendário de Dividendos</div><div class="g4" id="cardsDiv" style="margin-bottom:1rem"></div><div class="card"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Ativo</th><th>Tipo</th><th>Segmento</th><th>Pagamento</th><th class="r">Qtd</th><th class="r">IR</th><th class="r">IOF</th><th class="r">Valor Líquido</th><th>Status</th><th>Data COM</th></tr></thead><tbody id="tbDiv"></tbody></table></div></div></div>
+    <div id="tab-sinteticos" class="tab"><div class="sec">Dividendos Sintéticos</div><div class="g4" id="cardsSin" style="margin-bottom:1rem"></div><div class="g3" id="cardsSin2" style="margin-bottom:1rem"></div><div class="card"><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>#</th><th>Ação</th><th>Data Op.</th><th>Opção</th><th class="r">Strike</th><th class="r">% Strike</th><th>Tipo</th><th class="r">Qtd</th><th class="r">Prêmio rec.</th><th>Vencimento</th><th>Exercício</th><th class="r">% Geral</th><th class="r">Ganho Total</th><th class="r">% Líq.</th></tr></thead><tbody id="tbSin"></tbody></table></div></div></div>
+    <div id="tab-relatorios" class="tab"><div class="sec">Evolução Trimestral — Patrimônio</div><div class="card"><div style="overflow-x:auto"><table class="tbl" id="tblRel"><thead></thead><tbody></tbody></table></div></div></div>
+  </div>
+  <div id="errArea"></div>
+</div>
+<script>
+const API='https://script.google.com/macros/s/AKfycbz9s-nvIoatmd5l4Ntx_FdUPU4EerxpP5cJDzJ4prgsl1MtRHtt_jCpdvLPWOX7BICyCQ/exec';
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MESES_S=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+function tab(id,btn){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.nb').forEach(e=>e.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active')}
+const fmtBRL=v=>{const n=typeof v==='number'?v:parseFloat(String(v).replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.'));if(isNaN(n))return v||'—';return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})};
+const toNum=v=>{if(typeof v==='number')return v;const s=String(v).replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.');return parseFloat(s)||0};
+let cPie,cBar,cPieAt,cRenda;
+async function init(){
+  try{
+    const res=await fetch(API);
+    const data=await res.json();
+    document.getElementById('loadingScreen').style.display='none';
+    document.getElementById('appContent').style.display='block';
+    document.getElementById('syncDot').classList.add('live');
+    document.getElementById('syncLabel').textContent='Atualizado agora';
+    const modelo=data['MODELO']||[];
+    const divAba=data['Calendário Dividendos']||[];
+    const sinAba=data['Dividendos Sintéticos']||[];
+    const alugAba=data['Aluguéis']||[];
+    buildDashboard(modelo,divAba,sinAba,alugAba);
+    buildAlugueis(alugAba);
+    buildDividendos(divAba);
+    buildSinteticos(sinAba);
+    buildRelatorio(modelo);
+  }catch(e){
+    document.getElementById('loadingScreen').style.display='none';
+    document.getElementById('errArea').innerHTML='<div class="err">Erro ao conectar com a planilha.<br><small>'+e.message+'</small><br><br><button onclick="init()" style="margin-top:.5rem;padding:.4rem 1rem;background:rgba(184,150,74,.15);border:1px solid var(--br);color:var(--gold);border-radius:6px;cursor:pointer;font-family:Inter,sans-serif">Tentar novamente</button></div>';
+  }
+}
+function buildDashboard(modelo,divAba,sinAba,alugAba){
+  let mfTotal=0,outTotal=0,passivos=0,totalAtivos=0,patLiq=0;
+  for(let r of modelo){const lbl=String(r[0]||'').trim().toUpperCase();if(lbl.includes('SUBTOTAL')&&lbl.includes('MERCADO'))mfTotal=toNum(r[4]||r[3]||r[2]||r[1]);if(lbl.includes('SUBTOTAL')&&lbl.includes('OUTROS'))outTotal=toNum(r[4]||r[3]||r[2]||r[1]);if(lbl.includes('TOTAL PASSIVOS'))passivos=toNum(r[4]||r[3]||r[2]||r[1]);if(lbl==='TOTAL ATIVOS'||lbl.includes('TOTAL ATIVOS'))totalAtivos=toNum(r[4]||r[3]||r[2]||r[1]);if(lbl.includes('PATRIMÔNIO LÍQUIDO'))patLiq=toNum(r[4]||r[3]||r[2]||r[1]);}
+  if(!totalAtivos)totalAtivos=mfTotal+outTotal;
+  if(!patLiq)patLiq=totalAtivos-passivos;
+  document.getElementById('cardsPatrimonio').innerHTML='<div class="card"><div class="label">Total de Ativos</div><div class="value">'+fmtBRL(totalAtivos)+'</div></div><div class="card"><div class="label">Total de Passivos</div><div class="value red">'+(passivos>0?fmtBRL(passivos):'R$ 0')+'</div></div><div class="card card-accent"><div class="label">Patrimônio Líquido</div><div class="value gold lg">'+fmtBRL(patLiq)+'</div><div class="subval">Ativos − Passivos</div></div>';
+  const clsA=['Mercado Financeiro','Outros'],clsV=[mfTotal,outTotal].filter(v=>v>0),clsL=['Mercado Financeiro','Outros'].filter((_,i)=>[mfTotal,outTotal][i]>0),clsC=['#2563b8','#7ab8e8'].filter((_,i)=>[mfTotal,outTotal][i]>0);
+  const totC=clsV.reduce((a,b)=>a+b,0);
+  if(cPie)cPie.destroy();cPie=new Chart(document.getElementById('cPie'),{type:'doughnut',data:{labels:clsL,datasets:[{data:clsV,backgroundColor:clsC,borderWidth:2,borderColor:'#0b0e17',hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>' '+fmtBRL(i.raw)}}}}});
+  if(cBar)cBar.destroy();cBar=new Chart(document.getElementById('cBarClasse'),{type:'bar',data:{labels:clsL,datasets:[{data:clsV,backgroundColor:clsC,borderRadius:4,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>' '+fmtBRL(i.raw)}}},scales:{x:{ticks:{color:'#424858',font:{size:9},callback:v=>v>=1e3?(v/1e3).toFixed(0)+'k':v},grid:{color:'rgba(255,255,255,.03)'},border:{display:false}},y:{ticks:{color:'#7a8196',font:{size:9}},grid:{display:false},border:{display:false}}}}});
+  const lc=document.getElementById('legClasse');lc.innerHTML='';clsL.forEach((l,i)=>lc.innerHTML+='<span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:1px;background:'+clsC[i]+';display:inline-block"></span><span>'+l+'</span><strong style="color:var(--text);font-weight:500;margin-left:2px">'+((clsV[i]/totC)*100).toFixed(1)+'%</strong></span>');
+  const ativosArr=[];let cap=false;
+  for(let r of modelo){const lbl=String(r[0]||'').trim().toUpperCase();if(lbl.includes('MERCADO FINANCEIRO')||lbl.includes('OUTROS'))cap=true;if(lbl.includes('PASSIVOS'))cap=false;if(!cap)continue;if(lbl.includes('SUBTOTAL')||lbl.includes('TOTAL')||!r[0])continue;const val=toNum(r[4]||r[3]||r[2]||r[1]);if(val>0)ativosArr.push({n:String(r[0]).trim(),v:val,cat:String(r[0]).toUpperCase().match(/CARRO|CX |HONDA|CHEV/)?'Outros':'MF'});}
+  ativosArr.sort((a,b)=>b.v-a.v);const totA=ativosArr.reduce((a,b)=>a+b.v,0)||1;
+  const aC=ativosArr.map((_,i)=>{const b=['#1a3a6e','#1e4280','#224a92','#275eb8','#2b66c8','#3070d4','#3a7ed8','#447edc','#4e8ae6','#5896ec','#62a0f0','#6cacf4','#76b6f8','#7abce8','#6eb0e0','#5698d0','#4a8cc8','#3e80c0','#3274b8','#2668b0','#1a5ca8','#1050a0'];return b[i%b.length];});
+  if(cPieAt)cPieAt.destroy();cPieAt=new Chart(document.getElementById('cPieAt'),{type:'doughnut',data:{labels:ativosArr.map(a=>a.n),datasets:[{data:ativosArr.map(a=>a.v),backgroundColor:aC,borderWidth:1,borderColor:'#0b0e17',hoverOffset:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>' '+fmtBRL(i.raw)+' ('+((i.raw/totA)*100).toFixed(1)+'%)'}}}}}); 
+  const tbAt=document.getElementById('tbAt');tbAt.innerHTML='';ativosArr.forEach((a,i)=>{const pct=((a.v/totA)*100).toFixed(1);tbAt.innerHTML+='<tr><td style="display:flex;align-items:center;gap:.4rem;padding:.3rem .4rem"><span style="width:5px;height:5px;border-radius:50%;background:'+aC[i]+';flex-shrink:0;display:inline-block"></span><span style="color:var(--t2)">'+a.n+'</span><span class="cat-tag">('+( a.cat==='MF'?'Merc. Fin.':'Outros')+')</span></td><td style="text-align:right;padding:.3rem .4rem;color:var(--text);font-variant-numeric:tabular-nums">'+fmtBRL(a.v)+'</td><td style="text-align:right;padding:.3rem .4rem;color:var(--t3)">'+pct+'%</td></tr>';});
+  let alugTotal=0;const alugMeses=new Set();
+  for(let r of alugAba){const st=String(r[r.length-1]||'').toLowerCase();if(st.includes('recebido')){alugTotal+=toNum(r[6]||r[5]||0);const d=String(r[0]||'');if(d)alugMeses.add(d.substring(0,6));}}
+  const alugMensal=17900;if(!alugTotal)alugTotal=alugMensal*6;
+  let divTotal=0,sinTotal=0;const rendaMensal={alug:[],div:[],sin:[]};let inRenda=false;
+  for(let r of modelo){const lbl=String(r[0]||'').trim().toUpperCase();if(lbl.includes('RENDA PASSIVA MENSAL')){inRenda=true;continue;}if(inRenda&&lbl.includes('TOTAL 20')){inRenda=false;continue;}if(!inRenda)continue;const mesIdx=MESES.findIndex(m=>String(r[0]||'').trim().toLowerCase().startsWith(m.toLowerCase().substring(0,3)));if(mesIdx>=0){const a=toNum(r[1]||0)||alugMensal,d=toNum(r[2]||0),s=toNum(r[3]||0);rendaMensal.alug[mesIdx]=a;rendaMensal.div[mesIdx]=d;rendaMensal.sin[mesIdx]=s;if(d>0)divTotal+=d;if(s>0)sinTotal+=s;}}
+  const totalRenda=alugTotal+divTotal+sinTotal,mesesN=Math.max(alugMeses.size,6);
+  const aP=totalRenda>0?((alugTotal/totalRenda)*100).toFixed(1):0,dP=totalRenda>0?((divTotal/totalRenda)*100).toFixed(1):0,sP=totalRenda>0?((sinTotal/totalRenda)*100).toFixed(1):0;
+  const mediaRenda=totalRenda/mesesN;
+  document.getElementById('cardsRenda').innerHTML='<div class="card card-accent"><div class="label">Aluguéis recebidos</div><div class="value" style="color:var(--teal2)">'+fmtBRL(alugTotal)+'</div><div class="subval">'+mesesN+' meses</div></div><div class="card card-accent"><div class="label">Dividendos realizados</div><div class="value" style="color:var(--b3)">'+fmtBRL(divTotal)+'</div><div class="subval">Pagos 2026</div></div><div class="card card-accent"><div class="label">Sintéticos realizados</div><div class="value" style="color:var(--b4)">'+fmtBRL(sinTotal)+'</div><div class="subval">Líquido 2026</div></div><div class="card"><div class="label">Média mensal realizada</div><div class="value green">'+fmtBRL(mediaRenda)+'</div><div class="subval">Base realizada 2026</div></div>';
+  document.getElementById('splitBar').innerHTML='<div style="width:'+aP+'%;background:var(--teal)"></div><div style="width:'+dP+'%;background:var(--b2)"></div><div style="width:'+sP+'%;background:var(--b4)"></div>';
+  document.getElementById('splitLabels').innerHTML='<span style="color:var(--teal2)">▪ Aluguéis '+aP+'%</span><span style="color:var(--b3)">▪ Dividendos '+dP+'%</span><span style="color:var(--b4)">▪ Sintéticos '+sP+'%</span>';
+  document.getElementById('rendaLegend').innerHTML='<span style="display:flex;align-items:center;gap:.4rem"><span style="width:10px;height:2px;background:var(--teal);display:inline-block"></span>Aluguéis</span><span style="display:flex;align-items:center;gap:.4rem"><span style="width:10px;height:2px;background:var(--b2);display:inline-block"></span>Dividendos</span><span style="display:flex;align-items:center;gap:.4rem"><span style="width:10px;height:2px;background:var(--b4);display:inline-block"></span>Sintéticos</span>';
+  const alugArr=MESES_S.map((_,i)=>rendaMensal.alug[i]||0),divArr=MESES_S.map((_,i)=>rendaMensal.div[i]||0),sinArr=MESES_S.map((_,i)=>rendaMensal.sin[i]||0);
+  if(cRenda)cRenda.destroy();cRenda=new Chart(document.getElementById('cRenda'),{type:'bar',data:{labels:MESES_S,datasets:[{label:'Aluguéis',data:alugArr,backgroundColor:'#1a6a5a',borderRadius:2,stack:'r'},{label:'Dividendos',data:divArr,backgroundColor:'#2563b8',borderRadius:2,stack:'r'},{label:'Sintéticos',data:sinArr,backgroundColor:'#7ab8e8',borderRadius:2,stack:'r'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>' '+fmtBRL(i.raw)}}},scales:{x:{ticks:{color:'#424858',font:{size:9}},grid:{display:false},stacked:true,border:{display:false}},y:{ticks:{color:'#424858',font:{size:9},callback:v=>v>=1e3?(v/1e3).toFixed(0)+'k':v},grid:{color:'rgba(255,255,255,.03)'},stacked:true,border:{display:false}}}}});
+  const fases=[{meta:2500,l:'Fase 01'},{meta:5000,l:'Fase 02'},{meta:10000,l:'Fase 03'},{meta:20000,l:'Fase 04 — Liberdade'}];
+  const ilfWrap=document.getElementById('ilfWrap');ilfWrap.innerHTML='';
+  fases.forEach((f,i)=>{const pct=Math.min((mediaRenda/f.meta)*100,100),done=mediaRenda>=f.meta,isNext=!done&&(i===0||(mediaRenda>=fases[i-1].meta)),locked=!done&&!isNext;ilfWrap.innerHTML+='<div class="fase '+(done||isNext?'fase-active':'')+'"><div class="frow"><span class="ftitle" style="color:'+(done?'var(--green)':isNext?'var(--gold)':'var(--t2)')+'">'+f.l+'</span><span class="tag '+(done?'tag-done':isNext?'tag-active':'tag-locked')+'">'+(done?'✓ Concluída':isNext?'Em andamento':'Bloqueada')+'</span></div><div class="fmeta" style="color:'+(locked?'var(--t3)':'var(--t2)')+'">Meta <strong style="color:'+(locked?'var(--t3)':'var(--text)')+'">'+fmtBRL(f.meta)+'/mês</strong>'+(isNext?' &nbsp;·&nbsp; Atual <strong style="color:var(--green)">'+fmtBRL(mediaRenda)+'</strong>':'')+'</div><div class="fbar"><div class="fbar-fill" style="width:'+pct+'%;background:'+(done?'var(--green)':isNext?'linear-gradient(90deg,var(--gold),var(--gold2))':'var(--s4)')+'"></div></div><div class="fpct" style="color:'+(done?'var(--green)':isNext?'var(--gold)':'var(--t3)')+'">'+(done?'Renda supera a meta':isNext?pct.toFixed(1)+'% concluído':'Disponível após fase anterior')+'</div></div>';});
+  const tbRenda=document.getElementById('tbRenda');tbRenda.innerHTML='';let tA=0,tD=0,tS=0;
+  MESES.forEach((m,i)=>{const a=alugArr[i],d=divArr[i],s=sinArr[i],tot=a+d+s,fut=tot===0;tA+=a;tD+=d;tS+=s;tbRenda.innerHTML+='<tr><td style="color:'+(fut?'var(--t3)':'var(--text)')+'">'+m+'</td><td class="r '+(a>0?'pos':'')+'">'+(a>0?fmtBRL(a):'—')+'</td><td class="r '+(d>0?'pos':'')+'">'+(d>0?fmtBRL(d):'—')+'</td><td class="r '+(s>0?'pos':'')+'">'+(s>0?fmtBRL(s):'—')+'</td><td class="r '+(tot>0?'pos':'')+'">'+(tot>0?fmtBRL(tot):'—')+'</td></tr>';});
+  const mR=alugArr.filter(v=>v>0).length||6;tbRenda.innerHTML+='<tr class="tr-sub"><td>Total 2026</td><td class="r pos">'+fmtBRL(tA)+'</td><td class="r pos">'+fmtBRL(tD)+'</td><td class="r pos">'+fmtBRL(tS)+'</td><td class="r pos">'+fmtBRL(tA+tD+tS)+'</td></tr><tr class="tr-avg"><td>Média mensal</td><td class="r">'+fmtBRL(tA/mR)+'</td><td class="r">'+fmtBRL(tD/mR)+'</td><td class="r">'+fmtBRL(tS/mR)+'</td><td class="r green" style="font-weight:500">'+fmtBRL((tA+tD+tS)/mR)+'</td></tr>';
+  let apTotal=0;const apMes=[];let inAp=false;
+  for(let r of modelo){const lbl=String(r[0]||'').trim().toUpperCase();if(lbl.includes('APORTE')){inAp=true;continue;}if(inAp&&lbl.includes('TOTAL 20')){inAp=false;continue;}if(!inAp)continue;const mi=MESES.findIndex(m=>String(r[0]||'').trim().toLowerCase().startsWith(m.toLowerCase().substring(0,3)));if(mi>=0){const v=toNum(r[1]||r[2]||0);apMes[mi]=v;if(v>0)apTotal+=v;}}
+  const mAp=apMes.filter(v=>v>0).length||5,mediaAp=apTotal/mAp;
+  document.getElementById('cardsAportes').innerHTML='<div class="card card-accent"><div class="label">Total Aportado 2026</div><div class="value gold">'+fmtBRL(apTotal)+'</div></div><div class="card"><div class="label">Média de Aporte Mensal</div><div class="value">'+fmtBRL(mediaAp)+'</div><div class="subval">'+mAp+' meses</div></div><div class="card"><div class="label">Meses com Aporte</div><div class="value">'+mAp+' <span style="font-size:.9rem;color:var(--t2);font-weight:300">de 12</span></div></div>';
+  const tbAp=document.getElementById('tbAportes');tbAp.innerHTML='';let ac=0;
+  MESES.forEach((m,i)=>{const v=apMes[i]||0;if(v>0)ac+=v;const fut=v===0;tbAp.innerHTML+='<tr><td style="color:'+(fut?'var(--t3)':'var(--text)')+'">'+m+'</td><td class="r '+(v>0?'gold':'')+'">'+(v>0?fmtBRL(v):'—')+'</td><td class="r" style="color:'+(fut?'var(--t3)':'var(--text)')+'">'+fmtBRL(ac)+'</td></tr>';});
+  tbAp.innerHTML+='<tr class="tr-tot"><td>Total 2026</td><td class="r">'+fmtBRL(apTotal)+'</td><td class="r">'+fmtBRL(apTotal)+'</td></tr>';
+}
+function buildAlugueis(rows){
+  let total=0;const tb=document.getElementById('tbAlug');tb.innerHTML='';
+  const dr=rows.filter(r=>r[0]&&String(r[0]).match(/\d{2}\/\d{4}|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez/i));
+  dr.forEach(r=>{const ok=String(r[r.length-1]||'').toLowerCase().includes('recebid');if(ok)total+=toNum(r[6]||r[5]||0);const st=String(r[r.length-1]||'').trim();tb.innerHTML+='<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td style="color:var(--t2)">'+r[3]+'</td><td class="r pos">'+fmtBRL(toNum(r[4]||0))+'</td><td class="r">'+String(r[5]||'')+'</td><td class="r '+(ok?'pos':'')+'"> '+(ok?fmtBRL(toNum(r[6]||0)):'—')+'</td><td><span class="'+(ok?'status-rec':'status-pr')+'">'+st+'</span></td></tr>';});
+  const ms=new Set(dr.filter(r=>String(r[r.length-1]||'').toLowerCase().includes('recebid')).map(r=>String(r[0]).substring(0,6))).size||6;
+  document.getElementById('cardsAlug').innerHTML='<div class="card card-accent"><div class="label">Total Recebido 2026</div><div class="value" style="color:var(--teal2)">'+fmtBRL(total)+'</div></div><div class="card"><div class="label">Mensal Fixo</div><div class="value">R$ 17.900,00</div><div class="subval">4 imóveis ativos</div></div><div class="card"><div class="label">Meses Recebidos</div><div class="value">'+ms+' <span style="font-size:.9rem;color:var(--t2);font-weight:300">de 12</span></div></div><div class="card"><div class="label">Próximo Recebimento</div><div class="value" style="color:var(--b3)">Jul/2026</div></div>';
+}
+function buildDividendos(rows){
+  let realizado=0,projetado=0,proximo='—';const tb=document.getElementById('tbDiv');tb.innerHTML='';let st=false;
+  for(let r of rows){const c0=String(r[0]||'').trim();if(!st){if(c0&&!c0.toLowerCase().includes('ativo')&&c0.length>1)st=true;else continue;}if(!c0)continue;const vl=toNum(r[10]||r[9]||0),status=String(r[r.length-1]||r[12]||'').trim(),ok=status.toLowerCase().includes('confirm')||status.toLowerCase().includes('realiz'),fut=status.toLowerCase().includes('previsto')||status.toLowerCase().includes('projet');if(ok)realizado+=vl;if(fut)projetado+=vl;if((ok||fut)&&proximo==='—'){const dt=String(r[6]||'');if(dt.includes('/'))proximo=dt;}tb.innerHTML+='<tr><td style="color:var(--gold);font-weight:500">'+r[0]+'</td><td>'+r[2]+'</td><td>'+r[5]+'</td><td>'+(String(r[6]||'').includes('/')?r[6]:'')+'</td><td class="r">'+r[7]+'</td><td class="r">'+(toNum(r[8]||0)>0?fmtBRL(toNum(r[8]||0)):'—')+'</td><td class="r">'+(toNum(r[9]||0)>0?fmtBRL(toNum(r[9]||0)):'—')+'</td><td class="r '+(ok?'pos':'')+'" style="font-weight:500">'+fmtBRL(vl)+'</td><td><span class="'+(ok?'status-ok':fut?'status-pr':'')+'">'+(status||'—')+'</span></td><td style="color:var(--t3)">'+(r[13]||'')+'</td></tr>';}
+  document.getElementById('cardsDiv').innerHTML='<div class="card"><div class="label">Realizados</div><div class="value green">'+fmtBRL(realizado)+'</div></div><div class="card"><div class="label">Projetados</div><div class="value gold">'+fmtBRL(projetado)+'</div></div><div class="card card-accent"><div class="label">Total Geral</div><div class="value">'+fmtBRL(realizado+projetado)+'</div></div><div class="card"><div class="label">Próximo Pagamento</div><div class="value" style="color:var(--b3)">'+proximo+'</div></div>';
+}
+function buildSinteticos(rows){
+  let tRec=0,tLiq=0,ab=0,en=0,men='—',an='—';const tb=document.getElementById('tbSin');tb.innerHTML='';
+  for(let r of rows){const c0=String(r[0]||'').trim();if(c0.toLowerCase().includes('total receb'))tRec=toNum(r[1]||r[2]||0);if(c0.toLowerCase().includes('resultado'))tLiq=toNum(r[1]||r[2]||0);if(c0.toLowerCase().includes('abertas'))ab=toNum(r[1]||r[2]||0);if(c0.toLowerCase().includes('encerradas'))en=toNum(r[1]||r[2]||0);if(c0.toLowerCase().includes('mensal')&&String(r[1]||r[2]||'').includes('%'))men=String(r[1]||r[2]||'').trim();if(c0.toLowerCase().includes('anual')&&String(r[1]||r[2]||'').includes('%'))an=String(r[1]||r[2]||'').trim();const num=parseInt(c0);if(!isNaN(num)&&num>0&&r[1]){const tipo=String(r[6]||'').toUpperCase(),isCall=tipo==='CALL',pct=parseFloat(String(r[8]||'').replace('%','').replace(',','.'));tb.innerHTML+='<tr><td style="color:var(--t3)">'+r[0]+'</td><td style="color:var(--gold);font-weight:500">'+r[1]+'</td><td>'+(String(r[2]||'').includes('/')?r[2]:'')+'</td><td style="color:var(--t2)">'+(r[10]||'')+'</td><td class="r">'+(r[11]||'')+'</td><td class="r '+(pct>=0?'pos':'neg')+'">'+(r[8]||'')+'</td><td><span class="'+(isCall?'tag-call':'tag-put')+'">'+tipo+'</span></td><td class="r">'+(r[14]||'')+'</td><td class="r">'+(r[15]||'')+'</td><td>'+(String(r[16]||'').includes('/')?r[16]:'')+'</td><td style="color:var(--t2)">'+(r[19]||'')+'</td><td class="r">'+(r[20]||'')+'</td><td class="r pos" style="font-weight:500">'+(r[23]||'')+'</td><td class="r gold">'+(r[27]||'')+'</td></tr>';}}
+  document.getElementById('cardsSin').innerHTML='<div class="card card-accent"><div class="label">Total Recebido</div><div class="value gold">'+(tRec>0?fmtBRL(tRec):'—')+'</div></div><div class="card"><div class="label">Resultado Líquido</div><div class="value green">'+(tLiq>0?fmtBRL(tLiq):'—')+'</div></div><div class="card"><div class="label">% Líquida Média Mensal</div><div class="value gold">'+men+'</div><div class="subval">Selic nas put + lucro call</div></div><div class="card"><div class="label">% Líquida Média Anual</div><div class="value gold">'+an+'</div></div>';
+  document.getElementById('cardsSin2').innerHTML='<div class="card"><div class="label">Operações Abertas</div><div class="value" style="color:var(--b3)">'+(ab||'—')+'</div></div><div class="card"><div class="label">Operações Encerradas</div><div class="value">'+(en||'—')+'</div></div><div class="card"><div class="label">Ganho Valorização</div><div class="value green">Ver tabela</div></div>';
+}
+function buildRelatorio(modelo){
+  const tbl=document.getElementById('tblRel'),thead=tbl.querySelector('thead'),tbody=tbl.querySelector('tbody');thead.innerHTML='';tbody.innerHTML='';let st=false;
+  for(let r of modelo){const lbl=String(r[0]||'').trim().toUpperCase();if(lbl.includes('PATRIMÔNIO POR CATEGORIA')){st=true;continue;}if(!st)continue;if(lbl.includes('RENDA PASSIVA'))break;if(!thead.innerHTML&&r.some(c=>String(c||'').includes("'"))){thead.innerHTML='<tr>'+r.map((c,i)=>'<th'+(i>0?' class="r"':'')+'>'+c+'</th>').join('')+'</tr>';continue;}if(!r[0])continue;const isH=lbl.match(/MERCADO FINANC|^IMÓVEIS$|PARTICIPAÇ|^OUTROS$|^PASSIVOS$/),isSub=lbl.includes('SUBTOTAL'),isTot=lbl.match(/^TOTAL ATIVOS$|^TOTAL PASSIVOS$/),isLiq=lbl.includes('PATRIMÔNIO LÍQUIDO');let cls='';if(isH)cls='tr-hd';else if(isSub)cls='tr-sub';else if(isTot)cls='tr-tot';else if(isLiq)cls='tr-liq';tbody.innerHTML+='<tr class="'+cls+'">'+r.map((c,i)=>{const n=toNum(c);const show=n>0?fmtBRL(n):c||'—';return '<td'+(i>0?' class="r'+(n>0&&!isTot&&!isLiq?' pos':'')+(n<0?' neg':'')+'"':'')+'>'+show+'</td>';}).join('')+'</tr>';}
+  if(!thead.innerHTML)thead.innerHTML='<tr><th>Categoria / Item</th><th class="r">Q1'26</th><th class="r">Q2'26</th><th class="r">Q3'26</th><th class="r">Q4'26</th></tr>';
+}
+init();
+</script>
+</body>
+</html>
